@@ -1,31 +1,44 @@
 from tqdm import tqdm
 from doc_utils import *
 
-def generateTermFreq(category, save=True):
-    # category = 'up' || 'down'
-    csvlist = getListFromCSV(category)
+def generateTermFreq(save=True):
+    categories = ['up', 'down']
+    counter_ttl = Counter()
+    for category in categories:
+        csvlist = getListFromCSV(category)
 
-    counter = Counter()
-    for idx, elm in enumerate(tqdm(csvlist)):
-        if idx == 0: continue
-        counter += Counter(getPhraseLongEnough(elm[1]))
-    print(counter)
-    if save: COUNTER2JSON(category, counter)
+        counter = Counter()
+        for idx, elm in enumerate(tqdm(csvlist)):
+            if idx == 0: continue
+            counter += Counter(getPhraseLongEnough(elm[1], typ='LIST'))
+        print(counter)
 
-def generateDocFreq(category, save=True):
-    csvlist = getListFromCSV(category)
+        if save: COUNTER2JSON(category, counter)
+        counter_ttl += counter
+    print('TF_counter_ttl', counter_ttl)
+    if save: COUNTER2JSON('all', counter_ttl, 'tf')
 
-    counter = Counter()
-    for idx, elm in enumerate(tqdm(csvlist)):
-        if idx == 0: continue
-        counter += Counter(getPhraseLongEnough(elm[1], typ='SET'))
-    print(counter)
+def generateDocFreq(save=True):
+    categories = ['up', 'down']
+    counter_ttl = Counter()
+    for category in categories:
+        csvlist = getListFromCSV(category)
 
-    if save: COUNTER2JSON(category, counter, frqtype='df')
+        counter = Counter()
+        for idx, elm in enumerate(tqdm(csvlist)):
+            if idx == 0: continue
+            counter += Counter(getPhraseLongEnough(elm[1], typ='SET'))
+        print(counter)
+
+        if save: COUNTER2JSON(category, counter, frqtype='df')
+        counter_ttl += counter
+    print('DF_counter_ttl', counter_ttl)
+    if save: COUNTER2JSON('all', counter_ttl, 'df')
+
+def generateFreq(lmttyp, frqtyp):
+    # Make it more succinct?
+    pass
 
 def generateAllFreqs(save=True):
-    generateTermFreq('up', save)
-    generateDocFreq('up', save)
-    generateTermFreq('down', save)
-    generateDocFreq('down', save)
-    
+    generateTermFreq(save)
+    generateDocFreq(save)
