@@ -11,59 +11,33 @@ import monpa
 from collections import Counter
 import csv
 
+from frequencies import *
+from doc_utils import *
 
-def getPhraseLongEnough(sentance, typ = 'LIST'):
-    slices = monpa.cut(sentance)
-    '''ret_slices = []
-    for i in slices:
-        if(len(i)>=2):
-            ret_slices.append(i)
-    return ret_slices'''
-    if typ == 'LIST': return [i for i in slices if len(i) >= 2]
-    elif typ == 'SET': return [i for i in set(slices) if len(i)>=2]
+N_up = 612 # 613-1
+N_down = 126 # 127-1
+N_ttl = 738 # 613+127-1-1
 
-def getListFromCSV(category):
-    with open('limit_{}.csv'.format(category), newline='', encoding='utf-8') as file:
-        lst = list(csv.reader(file))
-    return lst
+def tf_idf(tf_cnt, df_cnt):
+    # tf-idf = (1+log(tf))*log(N/df)
+    # MI =
+    ret_dict = {}
+    for idx, elm in enumerate(tf_cnt.most_common()):
+        ret_dict[elm[0]] = (1 + math.log(elm[1])) * math.log(N_ttl/df_cnt[elm[0]])
 
+    return ret_dict
 
-def generateTermFreq(category, save=True):
-    # category = 'up' || 'down'
-    csvlist = getListFromCSV(category)
-
-    counter = Counter()
-    for idx, elm in enumerate(tqdm(csvlist)):
-        counter += Counter(getPhraseLongEnough(elm[1]))
-    print(counter)
-    if save: COUNTER2JSON(category, counter)
-
-def generateDocFreq(category, save=True):
-    csvlist = getListFromCSV(category)
-
-    counter = Counter()
-    for idx, elm in enumerate(tqdm(csvlist)):
-        if idx == 0: continue
-        counter += Counter(getPhraseLongEnough(elm[1], typ='SET'))
-    print(counter)
-
-    if save: COUNTER2JSON(category)
-
-def COUNTER2JSON(category, counter):
-    with open('tf_{}.json'.format(category), 'w') as file:
-        json.dump(counter, file)
-
-def JSON2COUNTER(category):
-    with open('tf_{}.json'.format(category), 'r') as file:
-        counter = Counter(json.load(file))
-        return counter
 
 
 def main():
-    generateDocFreq('up', False)
-    print(JSON2COUNTER('up'))
+    tf_up = JSON2COUNTER('up', 'tf')
+    df_up = JSON2COUNTER('up', 'df')
+    tf_down = JSON2COUNTER('down', 'tf')
+    df_down = JSON2COUNTER('down', 'df')
 
-
+    tfidfDict = tf_idf(tf_up, df_up)
+    tfidfSorted = sorted(tfidfDict.items(), key=lambda x:x[1], reverse=True)
+    print(tfidfSorted[0:10])
 
 if __name__ == '__main__':
     main()
