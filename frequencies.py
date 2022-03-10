@@ -10,7 +10,7 @@ def generateTermFreq(save=True):
         counter = Counter()
         for idx, elm in enumerate(tqdm(csvlist)):
             if idx == 0: continue
-            counter += Counter(getPhraseLongEnough(elm[1], typ='LIST'))
+            counter += Counter(getPhraseLongEnoughImproved(elm[1], typ='LIST'))
         print(counter)
 
         if save: COUNTER2JSON(category, counter)
@@ -27,7 +27,7 @@ def generateDocFreq(save=True):
         counter = Counter()
         for idx, elm in enumerate(tqdm(csvlist)):
             if idx == 0: continue
-            counter += Counter(getPhraseLongEnough(elm[1], typ='SET'))
+            counter += Counter(getPhraseLongEnoughImproved(elm[1], typ='SET'))
         print(counter)
 
         if save: COUNTER2JSON(category, counter, frqtype='df')
@@ -42,3 +42,6 @@ def generateFreq(lmttyp, frqtyp):
 def generateAllFreqs(save=True):
     generateTermFreq(save)
     generateDocFreq(save)
+
+if __name__ == '__main__':
+    generateAllFreqs()
