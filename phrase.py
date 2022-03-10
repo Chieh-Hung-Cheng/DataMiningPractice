@@ -115,8 +115,19 @@ def generatePhraseList(save=True):
     return ret_lst
 
 def showList(lst, num):
-    for elm in lst[0:num]:
-        print(elm)
+    namelist = []
+    for idx, elm in enumerate(lst[0:num]):
+        print('{} {}'.format(idx, elm))
+        namelist.append(elm.name)
+
+    cnt = 0
+    for elm in namelist:
+        print('{}'.format(elm), end=' ')
+        if cnt == 9:
+            cnt = 0
+            print('')
+        else: cnt += 1
+    print('\nNum: {}'.format(len(namelist)))
 
 if __name__ == '__main__':
     generate = False
