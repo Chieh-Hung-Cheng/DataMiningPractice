@@ -25,7 +25,6 @@ def getPhraseLongEnoughImproved(sentance, typ="LIST", part=False):
         if part: [i for i in set(slices) if len(i[0]) >= 2]
         else: return [i for i in set(slices) if len(i) >= 2]
 
-
 def getListFromCSV(category):
     with open('limit_{}.csv'.format(category), newline='', encoding='utf-8') as file:
         lst = list(csv.reader(file))

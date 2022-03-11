@@ -99,31 +99,29 @@ def generatePhraseList(save=True):
     if save: PhraseList2JSON(ret_lst)
     return ret_lst
 
-def showPhraseList(lst, num, show_detail=True):
-    namelist = []
-
-    for idx, elm in enumerate(lst[0:num]):
-        if show_detail: print('{} {}'.format(idx, elm))
-        namelist.append(elm.name)
-
-    showNameList(namelist)
-    return namelist
+def excludePhraseList(phlst_A, phlst_B):
+    ret_phlst = []
+    for phr in phlst_A:
+        pass
 
 
-def showNameList(namelist):
-    num = len(namelist)
+def showPhraseList(lst):
+    for idx, elm in enumerate(lst):
+        print('{} {}'.format(idx, elm))
+
+def showNameList(phraselist):
     cnt = 0
-    for elm in namelist[0:num]:
-        print('{}'.format(elm), end=' ')
+    for elm in phraselist:
+        print('{}'.format(elm.name), end=' ')
         if cnt == 9:
             cnt = 0
             print('')
         else:
             cnt += 1
-    print('\nNum: {}'.format(num))
+    print('\nNum: {}'.format(len(phraselist)))
 
 if __name__ == '__main__':
-    generate = True
+    generate = False
     if(generate): phraselist = generatePhraseList()
     else: phraselist = JSON2PhraseList()
-    showPhraseList(phraselist, 10)
+    showPhraseList(phraselist[0:10])

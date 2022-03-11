@@ -1,6 +1,7 @@
 from tqdm import tqdm
 from doc_utils import *
 
+
 def generateTermFreq(save=True):
     categories = ['up', 'down']
     counter_ttl = Counter()
