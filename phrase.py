@@ -7,32 +7,6 @@ N_ttl = 738  # 613+127-1-1
 
 
 class Phrase:
-    '''def __init__(self, name, tf_up, df_up, tf_down, df_down):
-        self.name = name
-        # Frequencies
-        self.tf_up = tf_up
-        self.df_up = df_up
-        self.tf_down = tf_down
-        self.df_down = df_down
-        self.df_all = self.df_up + self.df_down  # df_all
-        # MI, tfidf, associations
-        # UP
-        self.MI_up = 0
-        self.tfidf_up = 0
-        self.supp_up = 0
-        self.conf_up = 0
-        self.lift_up = 0
-        # Down
-        self.MI_down = 0
-        self.tfidf_down = 0
-        self.supp_down = 0
-        self.conf_down = 0
-        self.lift_down = 0
-        for elm in ['up', 'down']:
-            self.calc_MI(elm)
-            self.calc_tfidf(elm)
-            self.calc_assocs(elm)'''
-
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
         self.tf_all = self.tf_up + self.tf_down
@@ -41,6 +15,7 @@ class Phrase:
             self.calc_MI(elm)
             self.calc_tfidf(elm)
             self.calc_assocs(elm)
+            self.calc_chisq(elm)
 
     def __gt__(self, other):
         if self.conf_up > other.conf_up:
@@ -56,9 +31,10 @@ class Phrase:
     def __str__(self):
         frqstr = 'Phrase:{}\nUP: tf={}, df={} / {}\nDN: tf={}, df={} / {}\nALL: tf={}, df={} / {}\n' \
             .format(self.name, self.tf_up, self.df_up, N_up, self.tf_down, self.df_down, N_down, self.tf_all, self.df_all, N_ttl)
-        ascstr = 'UP: MI={:.3f}, tfidf={:.3f}, support={:.3f}, confidence={:.3f}, lift={:.3f} \nDN: MI={:.3f}, tfidf={:.3f}, support={:.3f}, confidence={:.3f}, lift={:.3f}' \
-            .format(self.MI_up, self.tfidf_up, self.supp_up, self.conf_up, self.lift_up, self.MI_down, self.tfidf_down,
-                    self.supp_down, self.conf_down, self.lift_down)
+        ascstr = 'UP: MI={:.3f}, tfidf={:.3f}, support={:.3f}, confidence={:.3f}, lift={:.3f}, CHISQ={:.3f}\nDN: MI={:.3f}, tfidf={:.3f}, support={:.3f}, confidence={:.3f}, lift={:.3f}, CHISQ={:.3f}' \
+            .format(self.MI_up, self.tfidf_up, self.supp_up, self.conf_up, self.lift_up, self.chisq_up,
+                    self.MI_down, self.tfidf_down, self.supp_down, self.conf_down, self.lift_down, self.chisq_down)
+
         return frqstr + ascstr + '\n -------------------------------------------------------------------------------------------'
 
     def calc_MI(self, lmttyp):
@@ -90,6 +66,15 @@ class Phrase:
             self.conf_down = self.df_down / self.df_all
             self.lift_down = (N_ttl * self.df_down) / (self.df_all * N_down)
 
+    def calc_chisq(self, lmttyp):
+        if lmttyp == 'up':
+            expected = self.df_all * N_up / N_ttl
+            self.chisq_up = (1 if self.df_up > expected else -1)*(self.df_up - expected)**2 / expected
+        elif lmttyp == 'down':
+            expected = self.df_all * N_down / N_ttl
+            self.chisq_down = (1 if self.df_down > expected else -1) * (self.df_down - expected)**2 / expected
+
+
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
@@ -114,23 +99,31 @@ def generatePhraseList(save=True):
     if save: PhraseList2JSON(ret_lst)
     return ret_lst
 
-def showList(lst, num):
+def showPhraseList(lst, num, show_detail=True):
     namelist = []
+
     for idx, elm in enumerate(lst[0:num]):
-        print('{} {}'.format(idx, elm))
+        if show_detail: print('{} {}'.format(idx, elm))
         namelist.append(elm.name)
 
+    showNameList(namelist)
+    return namelist
+
+
+def showNameList(namelist):
+    num = len(namelist)
     cnt = 0
-    for elm in namelist:
+    for elm in namelist[0:num]:
         print('{}'.format(elm), end=' ')
         if cnt == 9:
             cnt = 0
             print('')
-        else: cnt += 1
-    print('\nNum: {}'.format(len(namelist)))
+        else:
+            cnt += 1
+    print('\nNum: {}'.format(num))
 
 if __name__ == '__main__':
-    generate = False
+    generate = True
     if(generate): phraselist = generatePhraseList()
     else: phraselist = JSON2PhraseList()
-    showList(phraselist, 10)
+    showPhraseList(phraselist, 10)
