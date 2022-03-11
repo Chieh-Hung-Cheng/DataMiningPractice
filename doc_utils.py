@@ -5,7 +5,7 @@ import csv
 import json
 from collections import Counter
 
-from phrase import Phrase
+import phrase
 
 def getPhraseLongEnough(sentance, typ='LIST'):
     slices = monpa.cut(sentance)
@@ -51,7 +51,7 @@ def JSON2PhraseList(path='phraselist.json'):
         dictlist = json.load(file)
     ret_list = []
     for elm in dictlist:
-        ret_list.append(Phrase(**elm))
+        ret_list.append(phrase.Phrase(**elm))
     print('Load Phrase List Complete')
     return ret_list
 

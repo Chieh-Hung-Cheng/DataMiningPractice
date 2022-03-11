@@ -1,5 +1,5 @@
 import math
-from doc_utils import *
+import doc_utils
 
 N_up = 612  # 613-1
 N_down = 126  # 127-1
@@ -75,17 +75,14 @@ class Phrase:
             self.chisq_down = (1 if self.df_down > expected else -1) * (self.df_down - expected)**2 / expected
 
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-
 
 def generatePhraseList(save=True):
-    tf_up = JSON2COUNTER('up', 'tf')
-    df_up = JSON2COUNTER('up', 'df')
-    tf_down = JSON2COUNTER('down', 'tf')
-    df_down = JSON2COUNTER('down', 'df')
-    tf_all = JSON2COUNTER('all', 'tf')
-    df_all = JSON2COUNTER('all', 'df')
+    tf_up = doc_utils.JSON2COUNTER('up', 'tf')
+    df_up = doc_utils.JSON2COUNTER('up', 'df')
+    tf_down = doc_utils.JSON2COUNTER('down', 'tf')
+    df_down = doc_utils.JSON2COUNTER('down', 'df')
+    tf_all = doc_utils.JSON2COUNTER('all', 'tf')
+    df_all = doc_utils.JSON2COUNTER('all', 'df')
 
     ret_lst = []
     for key, val in df_all.most_common():
@@ -96,32 +93,53 @@ def generatePhraseList(save=True):
                         df_down=df_down[key] if key in df_down else 0
                         )
         ret_lst.append(phrase)
-    if save: PhraseList2JSON(ret_lst)
+    if save: doc_utils.PhraseList2JSON(ret_lst)
     return ret_lst
-
-def excludePhraseList(phlst_A, phlst_B):
-    ret_phlst = []
-    for phr in phlst_A:
-        pass
-
 
 def showPhraseList(lst):
     for idx, elm in enumerate(lst):
         print('{} {}'.format(idx, elm))
 
-def showNameList(phraselist):
-    cnt = 0
-    for elm in phraselist:
-        print('{}'.format(elm.name), end=' ')
-        if cnt == 9:
-            cnt = 0
-            print('')
-        else:
-            cnt += 1
-    print('\nNum: {}'.format(len(phraselist)))
+def showNameList(*args):
+    for phraselist in args:
+        cnt = 0
+        for elm in phraselist:
+            print('{}'.format(elm.name), end=' ')
+            if cnt == 9:
+                cnt = 0
+                print('')
+            else:
+                cnt += 1
+        print('\nNum: {}'.format(len(phraselist)))
+
+def filter(phraselist, **kwargs):
+    ret_phlst = phraselist.copy()
+    for key, val in kwargs.items():
+        ret_phlst = [i for i in ret_phlst if i.__dict__[key] > val]
+    return ret_phlst
+
+def generateUPDOWNlist(lmt100=True, show_detail=False, show_name=False):
+    phraselist = doc_utils.JSON2PhraseList()
+    phraselist.sort(key=lambda x: x.lift_up, reverse=True)
+    uplist = filter(phraselist, supp_up=0.105)
+
+    phraselist.sort(key=lambda x: x.chisq_down, reverse=True)
+    downlist = filter(phraselist, supp_down=0.015, conf_down=0.2, lift_down=1)
+
+    if show_detail:
+        showPhraseList(uplist)
+        showPhraseList(downlist)
+    if show_name:
+        showNameList(uplist)
+        showNameList(downlist)
+    uplist_exclude = [i for i in uplist if i not in downlist]
+    downlist_exclude = [i for i in downlist if i not in uplist]
+
+    if lmt100: return uplist_exclude[0:100], downlist_exclude[0:100]
+    else: return uplist_exclude, downlist_exclude
 
 if __name__ == '__main__':
     generate = False
     if(generate): phraselist = generatePhraseList()
-    else: phraselist = JSON2PhraseList()
+    else: phraselist = doc_utils.JSON2PhraseList()
     showPhraseList(phraselist[0:10])
