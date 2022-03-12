@@ -110,7 +110,7 @@ def showNameList(*args):
                 print('')
             else:
                 cnt += 1
-        print('\nNum: {}'.format(len(phraselist)))
+        print('Num: {}\n'.format(len(phraselist)))
 
 def filter(phraselist, **kwargs):
     ret_phlst = phraselist.copy()
