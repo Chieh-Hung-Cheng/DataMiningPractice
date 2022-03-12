@@ -31,7 +31,7 @@ def calc_costhetalist(veclist, tgtidx):
 
 def findMostRelevantArticles(tgtidx, phraselist, lmttyp, num=5):
     tfdoc_counterlist = doc_utils.JSON2COUNTERLIST('up') if lmttyp=='up' else doc_utils.JSON2COUNTERLIST('down')
-    doc_list = doc_utils.getListFromCSV('up') if lmttyp=='up' else doc_utils.getListFromCSV('up')
+    doc_list = doc_utils.getListFromCSV('up') if lmttyp=='up' else doc_utils.getListFromCSV('down')
     vectorlist = calc_tfCountVectorList(tfdoc_counterlist, phraselist)
     costheta_list = calc_costhetalist(vectorlist, tgtidx)
     costheta_list_sorted = sorted(costheta_list, key=lambda x: x[1], reverse=True)
