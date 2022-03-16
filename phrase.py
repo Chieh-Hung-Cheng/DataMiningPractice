@@ -115,16 +115,30 @@ def showNameList(*args):
 def filter(phraselist, **kwargs):
     ret_phlst = phraselist.copy()
     for key, val in kwargs.items():
-        ret_phlst = [i for i in ret_phlst if i.__dict__[key] > val]
+        ret_phlst = [i for i in ret_phlst if i.__dict__[key] >= val]
     return ret_phlst
 
-def generateUPDOWNlist(lmt100=True, show_detail=False, show_name=False):
+def spiltLimitations(limitations):
+    limitations_up = {}
+    limitations_down = {}
+    for key, val in limitations.items():
+        if key=='supp_up' or key=='conf_up' or key=='lift_up' or key=='tfidf_up':
+            limitations_up[key] = val
+        elif key=='supp_down' or key=='conf_down' or key=='lift_down' or key=='tfidf_down':
+            limitations_down[key] = val
+    return limitations_up, limitations_down
+
+def generateUPDOWNlist(limitations, lmt100=True, show_detail=False, show_name=False):
     phraselist = doc_utils.JSON2PhraseList()
+    limitations_up, limitations_down = spiltLimitations(limitations)
+
+    # generate list
     phraselist.sort(key=lambda x: x.lift_up, reverse=True)
-    uplist = filter(phraselist, supp_up=0.105)
+    uplist = filter(phraselist, **limitations_up)
 
     phraselist.sort(key=lambda x: x.chisq_down, reverse=True)
-    downlist = filter(phraselist, supp_down=0.015, conf_down=0.2, lift_down=1)
+    downlist = filter(phraselist, **limitations_down)
+    print('\nLists Generate Complete: with #_UP={}, #_DOWN={}'.format(len(uplist), len(downlist)))
 
     if show_detail:
         showPhraseList(uplist)
@@ -132,10 +146,13 @@ def generateUPDOWNlist(lmt100=True, show_detail=False, show_name=False):
     if show_name:
         showNameList(uplist)
         showNameList(downlist)
+    print('Exclude Common Terms...')
     uplist_exclude = [i for i in uplist if i not in downlist]
     downlist_exclude = [i for i in downlist if i not in uplist]
 
-    if lmt100: return uplist_exclude[0:100], downlist_exclude[0:100]
+    if lmt100:
+        print('Collect The Best 100 Phrases:\n')
+        return uplist_exclude[0:100], downlist_exclude[0:100]
     else: return uplist_exclude, downlist_exclude
 
 if __name__ == '__main__':

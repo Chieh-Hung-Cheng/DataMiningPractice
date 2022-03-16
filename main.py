@@ -3,7 +3,23 @@ import os
 import sys
 import time
 parser = argparse.ArgumentParser()
-parser.parse_args()
+parser.add_argument('--supp_up', default=0.105, type=float)
+parser.add_argument('--conf_up', default=0, type=float)
+parser.add_argument('--lift_up', default=0, type=float)
+parser.add_argument('--tfidf_up', default=0, type=float)
+#parser.add_argument('--MI_up', default=sys.float_info.min, type=float)
+#parser.add_argument('--chisq_up', default=sys.float_info.min, type=float)
+
+parser.add_argument('--supp_down', default=0.015, type=float)
+parser.add_argument('--conf_down', default=0.2, type=float)
+parser.add_argument('--lift_down', default=1, type=float)
+parser.add_argument('--tfidf_down', default=0, type=float)
+#parser.add_argument('--MI_down', default=sys.float_info.min, type=float)
+#parser.add_argument('--chisq_down', default=sys.float_info.min, type=float)
+
+args = parser.parse_args()
+
+limitations = vars(args)
 
 import numpy as np
 import math
@@ -19,6 +35,7 @@ from doc_utils import *
 from phrase import *
 from relevance import *
 from NaiveBayes import *
+from other_utils import *
 
 def main():
     force = False
@@ -26,24 +43,27 @@ def main():
     if (not os.path.exists('phraselist.json')) or force: generatePhraseList()
     if (not os.path.exists('tfdoc_up.json')) or force: generateTermFreqEachDoc()
     # Q1
-    phraselist_up, phraselist_down = generateUPDOWNlist()
+    showLimitaions(limitations)
+    phraselist_up, phraselist_down = generateUPDOWNlist(limitations)
+    print('UP LIMIT LIST:')
     showNameList(phraselist_up)
+    print('\nDOWN LIMIT LIST:')
     showNameList(phraselist_down)
+    print('_'*70)
 
     # Q2
-    findMostRelevantArticles(66, phraselist_up, 'up')
-    findMostRelevantArticles(55, phraselist_down, 'down')
-
+    ip = input('Paste the article below to SEARCH and CATEGORIZE:\n')
+    phraselist_ttl = phraselist_up + phraselist_down
+    searchByString(ip, phraselist_ttl)
+    print('_'*70)
     # Q3
-    lmttyp = 'down'
-    tgtidx = 69
-    sample_content = (doc_utils.getListFromCSV('up') if lmttyp == 'up' else doc_utils.getListFromCSV('down'))[tgtidx]
-    sample_tfcounter = (doc_utils.JSON2COUNTERLIST('up') if lmttyp == 'up' else doc_utils.JSON2COUNTERLIST('down'))[tgtidx]
-    print('\n\n\n', sample_content)
-    classifyByBayes(sample_tfcounter, *phrase.generateUPDOWNlist())
+    sample_content = ip
+    sample_tfcounter = Counter(frequencies.getPhraseLongEnoughImproved(sample_content))
+    classifyByBayes(sample_tfcounter, phraselist_up, phraselist_down)
 
 def test():
-    phraselist_up, phraselist_down = generateUPDOWNlist()
-    showNameList(phraselist_up, phraselist_down)
+    xargs = vars(args)
+    print(xargs)
+    print(type(xargs))
 if __name__ == '__main__':
     main()

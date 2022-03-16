@@ -44,3 +44,9 @@ def associations(lmttyp, df_ctr, df_all_ctr):
     ret_cfd_lst = sorted(cfd_dict.items(), key=lambda x: x[1], reverse=True)
     ret_lft_lst = sorted(lft_dict.items(), key=lambda x: x[1], reverse=True)
     return ret_sup_lst, ret_cfd_lst, ret_lft_lst
+
+def showLimitaions(limitaions):
+    print('Configured Limitations:')
+    for key, val in limitaions.items():
+        print('        {} = {}'.format(key, val))
+    print('\n', '_'*70, '\n')
