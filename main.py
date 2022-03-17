@@ -54,7 +54,7 @@ def main():
     # Q2
     ip = input('Paste the article below to SEARCH and CATEGORIZE:\n')
     phraselist_ttl = phraselist_up + phraselist_down
-    searchByString(ip, phraselist_ttl)
+    searchByString(ip, phraselist_ttl, knn_categorize=True)
     print('_'*70)
     # Q3
     sample_content = ip

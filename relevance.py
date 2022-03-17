@@ -44,7 +44,7 @@ def findMostRelevantArticles(tgtidx, phraselist, lmttyp, num=5):
             print('Relevance NO.{}, with Cosine(Theta)={}'.format(i, costheta_list_sorted[i][1]))
             print('Content:\n{}\n'.format(doc_list[costheta_list_sorted[i][0]]))
 
-def searchByString(ArticleString, phraselist200):
+def searchByString(ArticleString, phraselist200, knn_categorize=False):
     tgtctr = Counter(frequencies.getPhraseLongEnoughImproved(ArticleString))
     tgtvec = calc_tfCountVector(tgtctr, phraselist200)
 
@@ -58,6 +58,16 @@ def searchByString(ArticleString, phraselist200):
     for i in range(5):
         print('Relevance NO.{}, with Cosine(Theta)={}'.format(i+1, costheta_list_sorted[i][1]))
         print('Content:\n{}\n'.format(doc_list[costheta_list_sorted[i][0]]))
+
+    if knn_categorize:
+        num = 5
+        cnt = [0,0]
+        for idx in range(num):
+            if costheta_list_sorted[idx][0] < phrase.N_up: cnt[0]+=1
+            else: cnt[1]+=1
+        if(cnt[0]>=cnt[1]): print('KNN categorize as UP, with score UP:{} >= DOWN:{}'.format(cnt[0], cnt[1]))
+        else: print('KNN categorize as DOWN, with score UP{} < DOWN{}'.format(cnt[0], cnt[1]))
+
 
 if __name__ == '__main__':
     pass
