@@ -133,10 +133,10 @@ def generateUPDOWNlist(limitations, lmt100=True, show_detail=False, show_name=Fa
     limitations_up, limitations_down = spiltLimitations(limitations)
 
     # generate list
-    phraselist.sort(key=lambda x: x.lift_up, reverse=True)
+    phraselist.sort(key=lambda x: x.chisq_up*x.lift_up, reverse=True)
     uplist = filter(phraselist, **limitations_up)
 
-    phraselist.sort(key=lambda x: x.chisq_down, reverse=True)
+    phraselist.sort(key=lambda x: x.chisq_down*x.lift_down, reverse=True)
     downlist = filter(phraselist, **limitations_down)
     print('\nLists Generate Complete: with #_UP={}, #_DOWN={}'.format(len(uplist), len(downlist)))
 
