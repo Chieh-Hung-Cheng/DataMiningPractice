@@ -3,9 +3,9 @@ import os
 import sys
 import time
 parser = argparse.ArgumentParser()
-parser.add_argument('--supp_up', default=0.105, type=float)
-parser.add_argument('--conf_up', default=0, type=float)
-parser.add_argument('--lift_up', default=0, type=float)
+parser.add_argument('--supp_up', default=0.01, type=float)
+parser.add_argument('--conf_up', default=0.2, type=float)
+parser.add_argument('--lift_up', default=1, type=float)
 parser.add_argument('--tfidf_up', default=0, type=float)
 #parser.add_argument('--MI_up', default=sys.float_info.min, type=float)
 #parser.add_argument('--chisq_up', default=sys.float_info.min, type=float)
